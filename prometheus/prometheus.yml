@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]                    # use built-in HTTP module
+    static_configs:
+      - targets: ['http://nginx:80']        # probe the NGINX container
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115         # send to Blackbox exporter
+
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']         # host’s Node Exporter
+    metrics_path: /metrics
+
+rule_files:
+  - /etc/prometheus/alert.rules
