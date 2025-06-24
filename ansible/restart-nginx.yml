@@ -1,0 +1,9 @@
+---
+- hosts: nginx_host
+  gather_facts: false
+  tasks:
+    - name: Restart NGINX service
+      service:
+        name: nginx
+        state: restarted
+      become: yes
